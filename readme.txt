@@ -34,7 +34,7 @@ Copy the 'lwdrops' folder to your mods folder.
 
 Bug Report
 ==========
-
+https://forum.minetest.net/viewtopic.php?f=9&t=26331&p=390894#p390894
 
 
 Description
@@ -82,7 +82,7 @@ lwdrops.on_destroy (itemstack)
 
 
 Handlers:
-	Handlers are defined in the item definition, past to the various
+	Handlers are defined in the item definition, passed to the various
 	minetest.register_?? functions.
 
 
@@ -105,7 +105,7 @@ on_pickup (itemstack, fields)
 
 on_destroy (itemstack)
 	Called when the dropped item is about to be destroyed (permanently
-	removed from the world. No return value is used.
+	removed from the world). No return value is used.
 	itemstack: itemstack of the item/s about to be destroyed. This is for
 		querying, changing it has no effect.
 
