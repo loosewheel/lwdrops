@@ -1,4 +1,4 @@
-local version = "0.1.0"
+local version = "0.1.1"
 local mod_storage = minetest.get_mod_storage ()
 
 
@@ -298,7 +298,7 @@ else
 		on_step = function (self, dtime, moveresult)
 			local age = self.age + dtime
 
-			if time_to_live > 0 and age > time_to_live and age < (time_to_live + 0.2) then
+			if time_to_live > 0 and age > time_to_live then
 				local stack = ItemStack (self.itemstring)
 
 				if stack and stack:get_count () > 0 then
