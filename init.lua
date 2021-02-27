@@ -1,4 +1,4 @@
-local version = "0.1.1"
+local version = "0.1.2"
 local mod_storage = minetest.get_mod_storage ()
 
 
@@ -13,43 +13,43 @@ end
 
 
 
-local bigdrops_folder = minetest.get_worldpath().."/lwdrops"
+local drops_folder = minetest.get_worldpath().."/lwdrops"
 local time_to_live = tonumber (core.settings:get ("item_entity_ttl")) or 900
 
 
-minetest.mkdir (bigdrops_folder)
+minetest.mkdir (drops_folder)
 
 
-local bigdrop_data = minetest.deserialize (mod_storage:get_string ("bigdrop_data") or "")
-if type (bigdrop_data) ~= "table" then
-	bigdrop_data = { }
+local drops_data = minetest.deserialize (mod_storage:get_string ("drops_data") or "")
+if type (drops_data) ~= "table" then
+	drops_data = { }
 end
 
 
 
-local function store_bigdrop_data ()
-	mod_storage:set_string ("bigdrop_data",
-				minetest.serialize (bigdrop_data))
+local function store_drops_data ()
+	mod_storage:set_string ("drops_data",
+				minetest.serialize (drops_data))
 end
 
 
 
-local function get_bigdrop_data (itemstack)
+local function get_drops_data (itemstack)
 	if itemstack and itemstack.get_count then
 		local meta = itemstack:get_meta ()
 
 		if meta then
-			local id = meta:get_int ("_bigdrop_id")
+			local id = meta:get_int ("_lwdrops_id")
 
 			if id > 0 then
 				local name = tostring (id)
-				local entry = bigdrop_data[name]
+				local entry = drops_data[name]
 
 				if entry then
 					local fields = { }
 
 					for i = 1, #entry.fields do
-						local path = bigdrops_folder.."/bigdrop_"..entry.fields[i].."_"..name
+						local path = drops_folder.."/drop_"..entry.fields[i].."_"..name
 						local data = ""
 						local file = io.open (path, "r")
 
@@ -72,32 +72,32 @@ end
 
 
 
-local function remove_bigdrop_data (id)
+local function remove_drops_data (id)
 	if id > 0 then
 		local name = tostring (id)
-		local entry = bigdrop_data[name]
+		local entry = drops_data[name]
 
 		if entry then
 			for i = 1, #entry.fields do
-				local path = bigdrops_folder.."/bigdrop_"..entry.fields[i].."_"..name
+				local path = drops_folder.."/drop_"..entry.fields[i].."_"..name
 
 				os.remove (path)
 			end
 
-			bigdrop_data[name] = nil
+			drops_data[name] = nil
 
-			store_bigdrop_data ()
+			store_drops_data ()
 		end
 	end
 end
 
 
 
-local function check_bigdrop_data ()
+local function check_drops_data ()
 	local tm = os.time ()
 	local expired = { }
 
-	for k, v in pairs (bigdrop_data) do
+	for k, v in pairs (drops_data) do
 		if v.expire < tm then
 			expired[#expired + 1] = k
 		end
@@ -105,21 +105,21 @@ local function check_bigdrop_data ()
 
 	if #expired > 0 then
 		for i = 1, #expired do
-			local entry = bigdrop_data[expired[i]]
+			local entry = drops_data[expired[i]]
 
 			for i = 1, #entry.fields do
-				local path = bigdrops_folder.."/bigdrop_"..entry.fields[i].."_"..expired[i]
+				local path = drops_folder.."/drop_"..entry.fields[i].."_"..expired[i]
 
 				os.remove (path)
 			end
 
-			bigdrop_data[expired[i]] = nil
+			drops_data[expired[i]] = nil
 		end
 
-		store_bigdrop_data ()
+		store_drops_data ()
 	end
 
-	minetest.after (time_to_live, check_bigdrop_data)
+	minetest.after (time_to_live, check_drops_data)
 end
 
 
@@ -170,10 +170,10 @@ function lwdrops.store (itemstack, ... )
 			local id = math.random (1000000)
 			local name = tostring (id)
 
-			meta:set_int ("_bigdrop_id", id)
+			meta:set_int ("_lwdrops_id", id)
 
 			for i = 1, #fields do
-				local path = bigdrops_folder.."/bigdrop_"..fields[i].."_"..name
+				local path = drops_folder.."/drop_"..fields[i].."_"..name
 				local file = io.open (path, "w")
 
 				if file then
@@ -186,13 +186,13 @@ function lwdrops.store (itemstack, ... )
 				meta:set_string (fields[i], "")
 			end
 
-			bigdrop_data[name] =
+			drops_data[name] =
 			{
 				expire = os.time () + time_to_live + 10,
 				fields = fields
 			}
 
-			store_bigdrop_data ()
+			store_drops_data ()
 
 			return itemstack
 		end
@@ -236,10 +236,10 @@ else
 					local meta = stack:get_meta ()
 
 					if meta then
-						local id = meta:get_int ("_bigdrop_id")
+						local id = meta:get_int ("_lwdrops_id")
 
 						if id > 0 then
-							local fields = get_bigdrop_data (stack)
+							local fields = get_drops_data (stack)
 
 							if fields then
 								local count = stack:get_count ()
@@ -253,7 +253,7 @@ else
 								end
 
 								if stack:get_count () > 0 then
-									meta = remove_meta_key (meta, "_bigdrop_id")
+									meta = remove_meta_key (meta, "_lwdrops_id")
 
 									if def.on_pickup then
 										stack = def.on_pickup (stack, fields)
@@ -279,7 +279,7 @@ else
 									end
 								end
 
-								remove_bigdrop_data (id)
+								remove_drops_data (id)
 
 								self.itemstring = ""
 								self.object:remove()
@@ -307,10 +307,10 @@ else
 					local meta = stack:get_meta ()
 
 					if meta then
-						local id = meta:get_int ("_bigdrop_id")
+						local id = meta:get_int ("_lwdrops_id")
 
 						if id > 0 then
-							remove_bigdrop_data (id)
+							remove_drops_data (id)
 						end
 					end
 				end
@@ -328,7 +328,33 @@ end
 
 
 
-minetest.after (time_to_live, check_bigdrop_data)
+local pulverize = minetest.registered_chatcommands["pulverize"]
+if not pulverize then
+	minetest.log ("error", "lwdrops could not find 'pulverize' command")
+
+else
+	local pulverize_func = pulverize.func
+
+	minetest.override_chatcommand ("pulverize", {
+		func = function (name, param)
+			local player = minetest.get_player_by_name (name)
+
+			if player then
+				local item = player:get_wielded_item ()
+
+				if item and not item:is_empty () then
+					lwdrops.on_destroy (item)
+				end
+			end
+
+			return pulverize_func (name, param)
+		end
+	})
+end
+
+
+
+minetest.after (time_to_live, check_drops_data)
 
 
 

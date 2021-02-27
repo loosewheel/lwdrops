@@ -10,7 +10,7 @@ LGPL 2.1
 
 Version
 =======
-0.1.1
+0.1.2
 
 
 Minetest Version
@@ -40,9 +40,11 @@ https://forum.minetest.net/viewtopic.php?f=9&t=26331&p=390894#p390894
 Description
 ===========
 Utility to store large item metadata strings to file/s when dropped, which
-usually causes a server crash "String too long for serializeString". An
-on_destroy handler is also supported, called when a dropped item is about
-to be destroyed (permanently removed from the world).
+usually causes a server crash "String too long for serializeString".
+
+An on_destroy handler is also supported, called when a dropped item is about
+to be destroyed (permanently removed from the world), or when the pulverize
+command is used.
 
 Storage can be implemented with a single function call, and an optional
 handler. The data is stored in the world save folder, and cleanup of
