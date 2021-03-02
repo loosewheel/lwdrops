@@ -1,4 +1,4 @@
-local version = "0.1.2"
+local version = "0.1.3"
 local mod_storage = minetest.get_mod_storage ()
 
 
@@ -217,6 +217,7 @@ end
 
 
 
+-- hook dropped items entity
 local __builtin_item = minetest.registered_entities["__builtin:item"]
 if not __builtin_item then
 	minetest.log ("error", "lwdrops could not find '__builtin:item'")
@@ -328,6 +329,7 @@ end
 
 
 
+-- hook pulverize command
 local pulverize = minetest.registered_chatcommands["pulverize"]
 if not pulverize then
 	minetest.log ("error", "lwdrops could not find 'pulverize' command")
@@ -350,6 +352,87 @@ else
 			return pulverize_func (name, param)
 		end
 	})
+end
+
+
+
+-- hook default creative trash
+local creative_trash_inv = minetest.detached_inventories["creative_trash"]
+
+if creative_trash_inv then
+	local creative_trash_inv_on_put = creative_trash_inv.on_put
+
+	creative_trash_inv.on_put = function (inv, listname, index, stack, player)
+
+		if stack then
+			lwdrops.on_destroy (stack)
+		end
+
+		if creative_trash_inv_on_put then
+			creative_trash_inv_on_put (inv, listname, index, stack, player)
+		end
+	end
+
+end
+
+
+
+-- hook unified_inventory trash
+local trash_inv = minetest.detached_inventories["trash"]
+
+if trash_inv then
+	local trash_inv_on_put = trash_inv.on_put
+
+	trash_inv.on_put = function (inv, listname, index, stack, player)
+
+		if stack then
+			lwdrops.on_destroy (stack)
+		end
+
+		if trash_inv_on_put then
+			trash_inv_on_put (inv, listname, index, stack, player)
+		end
+	end
+
+end
+
+
+
+-- hook unified_inventory Clear inventory
+if minetest.global_exists ("unified_inventory") then
+	local buttons = unified_inventory.buttons
+
+	if buttons then
+		for i = 1, #buttons do
+			if buttons[i].name and buttons[i].name == "clear_inv" then
+				local action = buttons[i].action
+
+				if action then
+					buttons[i].action = function (player)
+						local player_name = player:get_player_name ()
+
+						if unified_inventory.is_creative(player_name) then
+							local inv = player:get_inventory ()
+
+							if inv then
+								local slots = inv:get_size ("main")
+
+								for i = 1, slots do
+									local stack = inv:get_stack ("main", i)
+
+									if stack then
+										lwdrops.on_destroy (stack)
+									end
+								end
+							end
+						end
+
+						action (player)
+					end
+				end
+			end
+		end
+	end
 end
 
 

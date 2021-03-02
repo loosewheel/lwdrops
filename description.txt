@@ -1,1 +1,1 @@
-Utility to store large item metadata strings to file/s when dropped.
+Utility to store large item metadata strings to file/s when dropped, and implement an on_destroy handler for items.

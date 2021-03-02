@@ -9,3 +9,9 @@ v0.1.1
 
 v0.1.2
 *	added on_destroy call from pulverize command
+
+
+v0.1.3
+*	hooked creative trash to call lwdrops.on_destroy ().
+*	hooked unified_inventory trash to call lwdrops.on_destroy ().
+*	hooked unified_inventory Clear inventory to call lwdrops.on_destroy ().
