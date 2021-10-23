@@ -1,4 +1,4 @@
-local version = "0.1.3"
+local version = "0.1.4"
 local mod_storage = minetest.get_mod_storage ()
 
 
@@ -323,7 +323,7 @@ else
 
 
 	-- set defined item as new __builtin:item, with the old one as fallback table
-	setmetatable(item, __builtin_item)
+	setmetatable(item, { __index = __builtin_item })
 	minetest.register_entity(":__builtin:item", item)
 end
 
