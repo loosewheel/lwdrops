@@ -10,7 +10,7 @@ LGPL 2.1
 
 Version
 =======
-0.1.4
+0.1.5
 
 
 Minetest Version
@@ -27,6 +27,7 @@ Optional Dependencies
 =====================
 creative
 unified_inventory
+i3
 
 
 Installation
@@ -50,6 +51,8 @@ An on_destroy handler is also supported, called when:
 *	when an item is destroyed with creative inventory trash.
 *	when an item is destroyed with unified_inventory trash.
 *	when the unified_inventory Clear inventory is used.
+*	when an item is destroyed with i3 inventory trash.
+*	when the i3 inventory Clear inventory is used.
 
 Storage can be implemented with a single function call, and an optional
 handler. The data is stored in the world save folder, and cleanup of

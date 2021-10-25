@@ -437,6 +437,75 @@ end
 
 
 
+-- hook i3 inventory trash
+local trash_inv = minetest.detached_inventories["i3_trash"]
+
+if trash_inv then
+	local trash_inv_on_put = trash_inv.on_put
+
+	trash_inv.on_put = function (inv, listname, index, stack, player)
+
+		if stack then
+			lwdrops.on_destroy (stack)
+		end
+
+		if trash_inv_on_put then
+			trash_inv_on_put (inv, listname, index, stack, player)
+		end
+	end
+
+end
+
+
+
+-- hook i3 inventory Clear inventory
+if minetest.global_exists ("i3") then
+	local tabs = i3.get_tabs ()
+
+	if tabs then
+		for i = 1, #tabs do
+			if tabs[i].name == "inventory" then
+				local old_fields = tabs[i].fields
+
+				tabs[i].fields = function (player, data, fields)
+					if fields.confirm_trash_yes then
+						local inv = player:get_inventory ()
+
+						if inv then
+							local slots = inv:get_size ("main")
+
+							for i = 1, slots do
+								local stack = inv:get_stack ("main", i)
+
+								if stack then
+									lwdrops.on_destroy (stack)
+								end
+							end
+
+
+							slots = inv:get_size ("craft")
+
+							for i = 1, slots do
+								local stack = inv:get_stack ("craft", i)
+
+								if stack then
+									lwdrops.on_destroy (stack)
+								end
+							end
+						end
+					end
+
+					return old_fields (player, data, fields)
+				end
+
+				break
+			end
+		end
+	end
+end
+
+
+
 minetest.after (time_to_live, check_drops_data)
 
 
