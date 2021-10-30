@@ -10,7 +10,7 @@ LGPL 2.1
 
 Version
 =======
-0.1.5
+0.1.6
 
 
 Minetest Version
@@ -20,11 +20,11 @@ This mod was developed on version 5.3.0
 
 Dependencies
 ============
-default
 
 
 Optional Dependencies
 =====================
+default
 creative
 unified_inventory
 i3
@@ -48,7 +48,7 @@ usually causes a server crash "String too long for serializeString".
 An on_destroy handler is also supported, called when:
 *	a dropped item is about to be destroyed (permanently removed from the world)
 *	when the pulverize command is used.
-*	when an item is destroyed with creative inventory trash.
+*	when an item is destroyed with Minetest Game creative inventory trash.
 *	when an item is destroyed with unified_inventory trash.
 *	when the unified_inventory Clear inventory is used.
 *	when an item is destroyed with i3 inventory trash.
@@ -61,6 +61,16 @@ redundant stored data is handled automatically.
 *	The mod uses os.time () for time stamping. In common platforms this
 returns a seconds count from an epoch. Lua documentation is ambiguous about
 less common platforms.
+
+While this mod is game agnostic, each game should be checked for
+functionality.
+
+Known to work with:
+Minetest Game
+Dream Builder Game
+
+Known to not work with:
+MineClone2
 
 
 

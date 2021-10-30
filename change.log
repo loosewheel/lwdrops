@@ -24,3 +24,7 @@ v0.1.4
 v0.1.5
 *	hooked i3 inventory trash to call lwdrops.on_destroy ().
 *	hooked i3 inventory Clear inventory to call lwdrops.on_destroy ().
+
+
+v0.1.6
+*	Made mod game agnostic.
