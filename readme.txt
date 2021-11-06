@@ -119,7 +119,7 @@ lwdrops.item_drop (itemstack, dropper, pos)
 
 	itemstack: the item/s to drop.
 	dropper: the player dropping the item/s.
-	pos: the world position the item/s is dropped
+	pos: the world position the item/s is dropped.
 
 
 
