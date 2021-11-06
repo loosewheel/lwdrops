@@ -10,7 +10,7 @@ LGPL 2.1
 
 Version
 =======
-0.1.6
+0.1.7
 
 
 Minetest Version
@@ -93,6 +93,36 @@ lwdrops.store (itemstack, ... )
 	*	the meta string names must be file name compatible.
 
 
+
+lwdrops.item_pickup (entity, cleanup)
+
+	Returns an ItemStack of the items in the given entity, and optionally
+	removes the entity and any stored data. On failure nil is returned.
+	This provides for custom pickup of dropped items that cooperates with
+	the lwdrops data system.
+
+	entity: this should be a "__builtin:item" entity, but is checked for
+			  internally and returns nil if not.
+	cleanup: if not false, and the call succeeds, the entity is removed
+				and any stored drop data is deleted.
+
+	*	this function can be called first with cleanup as false to check the
+		item, and if suitable called again with cleanup as nil or true to
+		remove the entity and any data.
+
+
+
+lwdrops.item_drop (itemstack, dropper, pos)
+
+	Drops the item using the item's on_drop handler if it has one, or
+	minetest.item_drop if not. Returns the leftover itemstack.
+
+	itemstack: the item/s to drop.
+	dropper: the player dropping the item/s.
+	pos: the world position the item/s is dropped
+
+
+
 lwdrops.on_destroy (itemstack)
 	Calls the on_destroy handler for the item, if one exists. When trashing
 	an item, calling this function allows the item definition to do any
@@ -126,6 +156,7 @@ on_pickup (itemstack, fields)
 on_destroy (itemstack)
 	Called when the dropped item is about to be destroyed (permanently
 	removed from the world). No return value is used.
+
 	itemstack: itemstack of the item/s about to be destroyed. This is for
 		querying, changing it has no effect.
 
@@ -171,5 +202,28 @@ function itemdef.on_destroy (itemstack)
 end
 
 
+
+-- custom pickup example
+local function custom_pickup (pos)
+	local list = minetest.get_objects_inside_radius (pos, 2)
+
+	for i = 1, #list do
+		if list[i].get_luaentity then
+			-- get stack to check
+			local stack = lwdrops.item_pickup (list[i]:get_luaentity (), false)
+
+			if stack then
+				local inv = minetest.get_meta (pos):get_inventory ()
+
+				if inv:room_for_item ("main", stack) then
+					inv:add_item ("main", stack)
+
+					-- cleanup
+					lwdrops.item_pickup (list[i]:get_luaentity ())
+				end
+			end
+		end
+	end
+end
 
 ------------------------------------------------------------------------

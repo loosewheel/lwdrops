@@ -1,4 +1,4 @@
-local version = "0.1.6"
+local version = "0.1.7"
 local mod_storage = minetest.get_mod_storage ()
 
 
@@ -213,6 +213,74 @@ function lwdrops.on_destroy (itemstack)
 			def.on_destroy (stack)
 		end
 	end
+end
+
+
+
+function lwdrops.item_drop (itemstack, dropper, pos)
+	if itemstack then
+		local def = find_item_def (itemstack:get_name ())
+
+		if def and def.on_drop then
+			return def.on_drop (itemstack, dropper, pos)
+		end
+	end
+
+	return minetest.item_drop (itemstack, dropper, pos)
+end
+
+
+
+function lwdrops.item_pickup (entity, cleanup)
+	local stack = nil
+
+	if entity and entity.name and entity.name == "__builtin:item" and
+		entity.itemstring and entity.itemstring ~= "" then
+
+		local name = entity.itemstring:match ("[%S]+")
+		local def = find_item_def (name)
+
+		if def then
+			stack = ItemStack (entity.itemstring)
+
+			if stack then
+				local meta = stack:get_meta ()
+
+				if meta then
+					local id = meta:get_int ("_lwdrops_id")
+
+					if id > 0 then
+						local fields = get_drops_data (stack)
+
+						if fields then
+							if stack:get_count () > 0 then
+								meta = remove_meta_key (meta, "_lwdrops_id")
+
+								if def.on_pickup then
+									stack = def.on_pickup (stack, fields)
+								else
+									for k, v in pairs (fields) do
+										meta:set_string (k, v)
+									end
+								end
+							end
+
+							if cleanup ~= false then
+								remove_drops_data (id)
+							end
+						end
+					end
+				end
+			end
+		end
+
+		if cleanup ~= false then
+			entity.itemstring = ""
+			entity.object:remove ()
+		end
+	end
+
+	return stack
 end
 
 

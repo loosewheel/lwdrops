@@ -28,3 +28,8 @@ v0.1.5
 
 v0.1.6
 *	Made mod game agnostic.
+
+
+v0.1.7
+*	Added lwdrops.item_pickup.
+*	Added lwdrops.item_drop.
