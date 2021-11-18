@@ -10,7 +10,7 @@ LGPL 2.1
 
 Version
 =======
-0.1.7
+0.1.8
 
 
 Minetest Version
@@ -84,13 +84,22 @@ lwdrops.store (itemstack, ... )
 	occurs writing out the data, the call succeeds and logs an error message.
 
 	itemstack: the itemstack containing the item/s.
-
 	... : series of (or one) metadata string field names to store. These are
 		the string fields that are nullified (set to "").
 
 	Call this from the on_drop handler of the item.
 
 	*	the meta string names must be file name compatible.
+
+
+
+lwdrops.on_destroy (itemstack)
+
+	Calls the on_destroy handler for the item, if one exists. When trashing
+	an item, calling this function allows the item definition to do any
+	cleanup work.
+
+	itemstack: an itemstack of the item being destroyed.
 
 
 
@@ -123,11 +132,30 @@ lwdrops.item_drop (itemstack, dropper, pos)
 
 
 
-lwdrops.on_destroy (itemstack)
-	Calls the on_destroy handler for the item, if one exists. When trashing
-	an item, calling this function allows the item definition to do any
-	cleanup work.
-	itemstack: an itemstack of the item being destroyed.
+lwdrops.node_dig (pos, toolname)
+
+	Returns list of ItemStacks that are dropped by the node at pos when
+	dug with toolname. Node handlers are called and dug sound is played.
+
+	pos: position of node to dig.
+	toolname: can be string name of the tool item, nil or true. If true
+				 the node is always dug, otherwise dug if can_dig returns
+				 true or nil.
+	silent: if true any dig sound for the node is not played.
+
+
+
+lwdrops.node_destroy (pos, force)
+
+	Removes the node at pos and calls the on_destroy handler. Returns
+	true if a node was removed and false if not. This function calls
+	lwdrops.node_dig.
+
+	pos: position of node to remove.
+	force: if nil or true the node is always removed, if it exists. If
+			 false the node is only removed if its can_dig handler returns
+			 true or nil.
+	silent: if true any dig sound for the node is not played.
 
 
 
@@ -144,7 +172,6 @@ on_pickup (itemstack, fields)
 
 	itemstack: the itemstack picked up. The itemstack is checked/reduced to
 		fit in the player's inventory.
-
 	fields: key and value table of the field data. The key is the metadata
 		field's name and the value is the string data.
 

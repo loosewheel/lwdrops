@@ -1,4 +1,4 @@
-local version = "0.1.7"
+local version = "0.1.8"
 local mod_storage = minetest.get_mod_storage ()
 
 
@@ -281,6 +281,83 @@ function lwdrops.item_pickup (entity, cleanup)
 	end
 
 	return stack
+end
+
+
+
+function lwdrops.node_dig (pos, toolname, silent)
+	local node = minetest.get_node_or_nil (pos)
+	local dig = false
+	local drops = nil
+
+	if toolname == true then
+		dig = true
+		toolname = nil
+	end
+
+	if silent == nil then
+		silent = false
+	end
+
+	if node and node.name ~= "air" and node.name ~= "ignore" then
+		local def = utils.find_item_def (node.name)
+
+		if not dig then
+			if def and def.can_dig then
+				local result, can_dig = pcall (def.can_dig, pos)
+
+				dig = ((not result) or (result and (can_dig == nil or can_dig == true)))
+			else
+				dig = true
+			end
+		end
+
+		if dig then
+			local items = minetest.get_node_drops (node, toolname)
+
+			if items then
+				drops = { }
+
+				for i = 1, #items do
+					drops[i] = ItemStack (items[i])
+				end
+
+				if def and def.preserve_metadata then
+					def.preserve_metadata (pos, node, minetest.get_meta (pos), drops)
+				end
+			end
+
+			if not silent and def and def.sounds and def.sounds.dug then
+				pcall (minetest.sound_play, def.sounds.dug, { pos = pos })
+			end
+
+			minetest.remove_node (pos)
+		end
+	end
+
+	return drops
+end
+
+
+
+function lwdrops.node_destroy (pos, force, silent)
+	if force == false then
+		force = nil
+	else
+		force = true
+	end
+
+	local drops = lwdrops.node_dig (pos, force, silent)
+
+	if drops then
+		for i = 1, #drops do
+			lwdrops.on_destroy (drops[i])
+		end
+
+		return true
+	end
+
+	return false
 end
 
 
