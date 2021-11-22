@@ -10,7 +10,7 @@ LGPL 2.1
 
 Version
 =======
-0.1.8
+0.1.9
 
 
 Minetest Version
