@@ -38,3 +38,8 @@ v0.1.7
 v0.1.8
 *	Added lwdrops.node_dig.
 *	Added lwdrops.node_destroy.
+
+
+v0.1.9
+*	Updated to work with new version of i3.
+*	Added lwdrops.on_destroy_inventory.

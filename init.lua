@@ -362,6 +362,22 @@ end
 
 
 
+function lwdrops.on_destroy_inventory (inv, listname)
+	if inv then
+		local slots = inv:get_size (listname)
+
+		for i = 1, slots do
+			local stack = inv:get_stack (listname, i)
+
+			if stack then
+				lwdrops.on_destroy (stack)
+			end
+		end
+	end
+end
+
+
+
 -- hook dropped items entity
 local __builtin_item = minetest.registered_entities["__builtin:item"]
 if not __builtin_item then
@@ -605,7 +621,17 @@ end
 
 -- hook i3 inventory Clear inventory
 if minetest.global_exists ("i3") then
-	local tabs = i3.get_tabs ()
+	local tabs = nil
+
+	if i3.get_tabs then
+		tabs = i3.get_tabs ()
+	elseif i3.tabs then
+		tabs = i3.tabs
+	else
+		minetest.log ("error", "lwdrops could not hook i3 Clear inventory")
+
+		return
+	end
 
 	if tabs then
 		for i = 1, #tabs do

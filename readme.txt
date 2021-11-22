@@ -103,6 +103,19 @@ lwdrops.on_destroy (itemstack)
 
 
 
+lwdrops.on_destroy_inventory (inv, listname)
+
+	Calls the on_destroy handler for every item in the inventory, if one
+	exists. When trashing an item, calling this function allows the item
+	definition to do any cleanup work.
+
+	inv: an InvRef containing the inventory.
+	listname: name of the inventory.
+
+	Note - this call does not remove the items from the inventory.
+
+
+
 lwdrops.item_pickup (entity, cleanup)
 
 	Returns an ItemStack of the items in the given entity, and optionally
